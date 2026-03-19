@@ -5,12 +5,16 @@ import base64
 import asyncio
 import io
 import time
+import uuid
+import shutil
 from pathlib import Path
 
 # Add vendored dependencies to sys.path
 deps_path = str(Path(__file__).parent / "deps")
 if deps_path not in sys.path:
     sys.path.insert(0, deps_path)
+
+import av
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -46,6 +50,9 @@ gp = GlobalPlugins()
 
 SYSTEM_PROMPT_PREFIX = "You are a helpful voice assistant. RESPOND IN PLAIN TEXT ONLY. No markdown, no asterisks, no bullets. Keep sentences short and conversational. "
 
+# Global VLM session storage
+vlm_sessions: dict[str, gemini.VLM] = {}
+
 @app.on_event("startup")
 async def startup():
     gp.stt = deepgram.STT(eager_turn_detection=True)
@@ -53,8 +60,81 @@ async def startup():
     print("✅ [Backend] Global plugins initialized")
 
 # Helper for standard REST streaming (non-live)
-async def stream_gemini_response(prompt):
-    vlm = gemini.VLM(model="gemini-flash-latest")
+async def stream_gemini_response(prompt, video_path=None, session_id=None):
+    with open("debug.log", "a") as f:
+        f.write(f"\n--- New Request: {time.ctime()} ---\n")
+        f.write(f"Prompt: {prompt}\n")
+        f.write(f"Video Path: {video_path}\n")
+        f.write(f"Session ID: {session_id}\n")
+
+    vlm = None
+    if session_id and session_id in vlm_sessions:
+        vlm = vlm_sessions[session_id]
+        print(f"🔄 [Backend] Reusing VLM session: {session_id}")
+    else:
+        vlm = gemini.VLM(model="gemini-3-flash-preview", frame_buffer_seconds=300)
+        if session_id:
+            vlm_sessions[session_id] = vlm
+            print(f"🆕 [Backend] Created new VLM session: {session_id}")
+
+    if video_path:
+        # Clear existing frames if a new video is uploaded to an existing session
+        if hasattr(vlm, "_frame_buffer"):
+            vlm._frame_buffer.clear()
+            print(f"🧹 [Backend] Cleared frame buffer for session {session_id}")
+
+        print(f"🎞️ [Backend] Extracting frames from: {video_path}")
+        try:
+            container = av.open(video_path)
+            stream = container.streams.video[0]
+            
+            # Get video info
+            duration = float(stream.duration * stream.time_base) if stream.duration else 0
+            total_frames = stream.frames if stream.frames else 0
+            info = f"🎥 [Backend] Video Info: duration={duration}s, total_frames={total_frames}"
+            print(info)
+            with open("debug.log", "a") as f: f.write(info + "\n")
+
+            fps = 1
+            interval = 1.0 / fps
+            next_timestamp = 0.0
+            
+            frame_count = 0
+            decoded_count = 0
+            for frame in container.decode(video=0):
+                decoded_count += 1
+                if frame.pts is not None:
+                    timestamp = float(frame.pts * stream.time_base)
+                else:
+                    stream_fps = float(stream.average_rate) if stream.average_rate else 30
+                    timestamp = decoded_count / stream_fps
+
+                if timestamp >= next_timestamp:
+                    vlm.add_frame(frame)
+                    next_timestamp += interval
+                    frame_count += 1
+                    if frame_count % 10 == 0:
+                        msg = f"  ...extracted {frame_count} frames (at {timestamp:.2f}s)"
+                        print(msg)
+                        with open("debug.log", "a") as f: f.write(msg + "\n")
+                    if frame_count >= 100: # Max 100 frames
+                        break
+            
+            container.close()
+            final_msg = f"✅ [Backend] Successfully extracted {frame_count} frames from {decoded_count} decoded"
+            print(final_msg)
+            buffer_msg = f"📦 [Backend] VLM buffer size: {len(vlm._frame_buffer)}"
+            print(buffer_msg)
+            with open("debug.log", "a") as f: 
+                f.write(final_msg + "\n")
+                f.write(buffer_msg + "\n")
+        except Exception as e:
+            err_msg = f"❌ [Backend] Error during frame extraction: {e}"
+            print(err_msg)
+            with open("debug.log", "a") as f: f.write(err_msg + "\n")
+            import traceback
+            traceback.print_exc()
+
     try:
         event_queue = asyncio.Queue()
         async def on_chunk(event: LLMResponseChunkEvent):
@@ -266,10 +346,53 @@ async def live_chat_endpoint(websocket: WebSocket):
 @app.post("/analyze_stream")
 async def analyze_video_stream(
     video: UploadFile = File(None),
-    prompt: str = Form("Describe this video")
+    prompt: str = Form("Describe this video"),
+    session_id: str = Form(None)
 ):
-    return StreamingResponse(stream_gemini_response(prompt), media_type="text/plain")
+    call_msg = f"🚀 [Backend] /analyze_stream called with video={video.filename if video else 'None'}, prompt='{prompt}', session_id={session_id}"
+    print(call_msg)
+    with open("debug.log", "a") as f: f.write(call_msg + "\n")
+    
+    video_path = None
+    if video:
+        try:
+            # Create a temporary file to save the uploaded video
+            temp_dir = Path("temp_videos")
+            temp_dir.mkdir(exist_ok=True)
+            suffix = Path(video.filename).suffix
+            temp_file = temp_dir / f"{uuid.uuid4()}{suffix}"
+            video_path = str(temp_file)
+            
+            save_msg = f"💾 [Backend] Saving uploaded video to {video_path}"
+            print(save_msg)
+            with open(video_path, "wb") as buffer:
+                shutil.copyfileobj(video.file, buffer)
+            size_msg = f"✅ [Backend] Video saved successfully ({os.path.getsize(video_path)} bytes)"
+            print(size_msg)
+            with open("debug.log", "a") as f: 
+                f.write(save_msg + "\n")
+                f.write(size_msg + "\n")
+        except Exception as e:
+            err_msg = f"❌ [Backend] Error saving video: {e}"
+            print(err_msg)
+            with open("debug.log", "a") as f: f.write(err_msg + "\n")
+            video_path = None
+        
+    async def wrapped_stream():
+        try:
+            async for chunk in stream_gemini_response(prompt, video_path, session_id):
+                yield chunk
+        finally:
+            # Cleanup
+            if video_path and os.path.exists(video_path):
+                try:
+                    os.remove(video_path)
+                    print(f"🧹 [Backend] Cleaned up temp video: {video_path}")
+                except:
+                    pass
+
+    return StreamingResponse(wrapped_stream(), media_type="text/plain")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

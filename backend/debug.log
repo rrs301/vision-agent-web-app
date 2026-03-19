@@ -1,0 +1,115 @@
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this video?'
+❌ [Backend] Error saving video: name 'uuid' is not defined
+
+--- New Request: Thu Mar 19 19:26:25 2026 ---
+Prompt: What is this video?
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this video?'
+❌ [Backend] Error saving video: name 'uuid' is not defined
+
+--- New Request: Thu Mar 19 19:26:25 2026 ---
+Prompt: What is this video?
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi'
+
+--- New Request: Thu Mar 19 19:27:21 2026 ---
+Prompt: Hi
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi'
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi'
+
+--- New Request: Thu Mar 19 19:27:28 2026 ---
+Prompt: Hi
+Video Path: None
+
+--- New Request: Thu Mar 19 19:27:28 2026 ---
+Prompt: Hi
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this video?'
+❌ [Backend] Error saving video: name 'uuid' is not defined
+
+--- New Request: Thu Mar 19 19:27:37 2026 ---
+Prompt: What is this video?
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi'
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi'
+
+--- New Request: Thu Mar 19 19:31:40 2026 ---
+Prompt: Hi
+Video Path: None
+
+--- New Request: Thu Mar 19 19:31:40 2026 ---
+Prompt: Hi
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What ois this vieo?'
+💾 [Backend] Saving uploaded video to temp_videos/03424f0f-bf52-46b2-b107-782178952a0e.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 19:31:49 2026 ---
+Prompt: What ois this vieo?
+Video Path: temp_videos/03424f0f-bf52-46b2-b107-782178952a0e.mp4
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='Remember this word: ANTIGRAVITY. What is the word I told you to remember?'
+
+--- New Request: Thu Mar 19 19:35:30 2026 ---
+Prompt: Remember this word: ANTIGRAVITY. What is the word I told you to remember?
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=None, prompt='What was the word I asked you to remember in the previous message?'
+
+--- New Request: Thu Mar 19 19:35:32 2026 ---
+Prompt: What was the word I asked you to remember in the previous message?
+Video Path: None
+🚀 [Backend] /analyze_stream called with video=None, prompt='Remember this word: ANTIGRAVITY. What is the word I told you to remember?', session_id=844faa51-7c63-4f23-a753-2bb613b62e4c
+
+--- New Request: Thu Mar 19 19:38:42 2026 ---
+Prompt: Remember this word: ANTIGRAVITY. What is the word I told you to remember?
+Video Path: None
+Session ID: 844faa51-7c63-4f23-a753-2bb613b62e4c
+🚀 [Backend] /analyze_stream called with video=None, prompt='What was the word I asked you to remember in the previous message?', session_id=844faa51-7c63-4f23-a753-2bb613b62e4c
+
+--- New Request: Thu Mar 19 19:38:44 2026 ---
+Prompt: What was the word I asked you to remember in the previous message?
+Video Path: None
+Session ID: 844faa51-7c63-4f23-a753-2bb613b62e4c
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this game?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+💾 [Backend] Saving uploaded video to temp_videos/bd34c6a6-c159-47cf-816b-e247b2ebd512.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 19:42:48 2026 ---
+Prompt: What is this game?
+Video Path: temp_videos/bd34c6a6-c159-47cf-816b-e247b2ebd512.mp4
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this game?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+💾 [Backend] Saving uploaded video to temp_videos/dc895749-e091-4d13-b24a-93df6faa2798.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 19:42:49 2026 ---
+Prompt: What is this game?
+Video Path: temp_videos/dc895749-e091-4d13-b24a-93df6faa2798.mp4
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='What is his shirt color?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+
+--- New Request: Thu Mar 19 19:43:02 2026 ---
+Prompt: What is his shirt color?
+Video Path: None
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🚀 [Backend] /analyze_stream called with video=None, prompt='Left hand or right hand?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+
+--- New Request: Thu Mar 19 19:43:14 2026 ---
+Prompt: Left hand or right hand?
+Video Path: None
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🚀 [Backend] /analyze_stream called with video=None, prompt='What tech do u recommand?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+
+--- New Request: Thu Mar 19 19:43:39 2026 ---
+Prompt: What tech do u recommand?
+Video Path: None
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f

@@ -27,9 +27,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isLive, setIsLive] = useState(false);
+  const [sessionId] = useState(() => crypto.randomUUID());
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -232,6 +235,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     try {
       const formData = new FormData();
       formData.append('prompt', prompt);
+      formData.append('session_id', sessionId);
       if (fileToShare) formData.append('video', fileToShare);
 
       const response = await fetch('http://localhost:8000/analyze_stream', { method: 'POST', body: formData });
@@ -280,11 +284,28 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || isTyping) return;
+    if ((!inputValue.trim() && !selectedVideo) || isTyping) return;
     const msg = inputValue;
-    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: msg }]);
+    const video = selectedVideo;
+    
+    const userMsgId = Date.now().toString();
+    setMessages(prev => [...prev, { 
+      id: userMsgId, 
+      role: 'user', 
+      content: msg,
+      videoUrl: video ? URL.createObjectURL(video) : undefined
+    }]);
+    
     setInputValue('');
-    getAIResponse(msg);
+    setSelectedVideo(null);
+    getAIResponse(msg || "Analyze this video", video || undefined);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      setSelectedVideo(file);
+    }
   };
 
   return (
@@ -354,18 +375,51 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       <div className="p-6 border-t border-white/10 glass">
-        <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto relative">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={screenStream ? "Ask about your screen..." : "Follow up..."}
-            disabled={isTyping}
-            className="w-full glass-input rounded-xl py-4 pl-6 pr-16 text-white placeholder:text-zinc-500 focus:ring-0 disabled:opacity-50"
-          />
-          <button type="submit" disabled={!inputValue.trim() || isTyping} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-brand-primary hover:text-white transition-colors disabled:opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-          </button>
+        <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto relative space-y-4">
+          {selectedVideo && (
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 animate-enter">
+              <div className="text-brand-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>
+              </div>
+              <span className="text-sm text-zinc-300 truncate max-w-[200px]">{selectedVideo.name}</span>
+              <button 
+                type="button"
+                onClick={() => setSelectedVideo(null)}
+                className="ml-auto text-zinc-500 hover:text-white transition-colors"
+                title="Remove Video"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+            </div>
+          )}
+          <div className="relative">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="video/*"
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-2 text-zinc-400 hover:text-brand-primary transition-colors"
+              title="Upload Video"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect><path d="M12 10v4"></path><path d="M10 12h4"></path></svg>
+            </button>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={screenStream ? "Ask about your screen..." : "Upload a video or ask a question..."}
+              disabled={isTyping}
+              className="w-full glass-input rounded-xl py-4 pl-12 pr-16 text-white placeholder:text-zinc-500 focus:ring-0 disabled:opacity-50"
+            />
+            <button type="submit" disabled={(!inputValue.trim() && !selectedVideo) || isTyping} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-brand-primary hover:text-white transition-colors disabled:opacity-50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
         </form>
       </div>
     </div>
