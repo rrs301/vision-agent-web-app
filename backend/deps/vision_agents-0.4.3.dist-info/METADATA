@@ -1,0 +1,145 @@
+Metadata-Version: 2.4
+Name: vision-agents
+Version: 0.4.3
+Summary: Open video agents. Build low latency video and voice agents on any realtime edge network.
+Project-URL: Documentation, https://visionagents.ai/
+Project-URL: Website, https://visionagents.ai/
+Project-URL: Source, https://github.com/GetStream/Vision-Agents
+Keywords: AI,agents,video AI,video agents,voice AI,voice agents
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Python: >=3.10
+Requires-Dist: colorlog>=6.10.1
+Requires-Dist: fastapi>=0.135.1
+Requires-Dist: getstream[telemetry,webrtc]<4,>=3.0.0
+Requires-Dist: mcp<2,>=1.23.3
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: onnxruntime<2,>=1.16.1
+Requires-Dist: pillow<11,>=10.4.0
+Requires-Dist: python-dotenv>=1.1.1
+Requires-Dist: urllib3>=2.6.3
+Requires-Dist: uvicorn>=0.38.0
+Provides-Extra: all-plugins
+Requires-Dist: vision-agents-plugins-anthropic; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-assemblyai; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-aws; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-cartesia; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-decart; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-deepgram; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-elevenlabs; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-fast-whisper; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-fish; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-gemini; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-getstream; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-heygen; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-huggingface; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-inworld; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-kokoro; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-lemonslice; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-mistral; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-moondream; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-moonshine; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-nvidia; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-openai; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-openrouter; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-pocket; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-qwen; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-roboflow; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-smart-turn; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-turbopuffer; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-twilio; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-ultralytics; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-vogent; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-wizper; extra == 'all-plugins'
+Requires-Dist: vision-agents-plugins-xai; extra == 'all-plugins'
+Provides-Extra: anthropic
+Requires-Dist: vision-agents-plugins-anthropic; extra == 'anthropic'
+Provides-Extra: assemblyai
+Requires-Dist: vision-agents-plugins-assemblyai; extra == 'assemblyai'
+Provides-Extra: aws
+Requires-Dist: vision-agents-plugins-aws; extra == 'aws'
+Provides-Extra: cartesia
+Requires-Dist: vision-agents-plugins-cartesia; extra == 'cartesia'
+Provides-Extra: decart
+Requires-Dist: vision-agents-plugins-decart; extra == 'decart'
+Provides-Extra: deepgram
+Requires-Dist: vision-agents-plugins-deepgram; extra == 'deepgram'
+Provides-Extra: dev
+Requires-Dist: click; extra == 'dev'
+Requires-Dist: mypy; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Provides-Extra: elevenlabs
+Requires-Dist: vision-agents-plugins-elevenlabs; extra == 'elevenlabs'
+Provides-Extra: fast-whisper
+Requires-Dist: vision-agents-plugins-fast-whisper; extra == 'fast-whisper'
+Provides-Extra: fish
+Requires-Dist: vision-agents-plugins-fish; extra == 'fish'
+Provides-Extra: gemini
+Requires-Dist: vision-agents-plugins-gemini; extra == 'gemini'
+Provides-Extra: getstream
+Requires-Dist: vision-agents-plugins-getstream; extra == 'getstream'
+Provides-Extra: heygen
+Requires-Dist: vision-agents-plugins-heygen; extra == 'heygen'
+Provides-Extra: huggingface
+Requires-Dist: vision-agents-plugins-huggingface; extra == 'huggingface'
+Provides-Extra: inworld
+Requires-Dist: vision-agents-plugins-inworld; extra == 'inworld'
+Provides-Extra: kokoro
+Requires-Dist: vision-agents-plugins-kokoro; extra == 'kokoro'
+Provides-Extra: lemonslice
+Requires-Dist: vision-agents-plugins-lemonslice; extra == 'lemonslice'
+Provides-Extra: mistral
+Requires-Dist: vision-agents-plugins-mistral; extra == 'mistral'
+Provides-Extra: moondream
+Requires-Dist: vision-agents-plugins-moondream; extra == 'moondream'
+Provides-Extra: moonshine
+Requires-Dist: vision-agents-plugins-moonshine; extra == 'moonshine'
+Provides-Extra: nvidia
+Requires-Dist: vision-agents-plugins-nvidia; extra == 'nvidia'
+Provides-Extra: openai
+Requires-Dist: vision-agents-plugins-openai; extra == 'openai'
+Provides-Extra: openrouter
+Requires-Dist: vision-agents-plugins-openrouter; extra == 'openrouter'
+Provides-Extra: pocket
+Requires-Dist: vision-agents-plugins-pocket; extra == 'pocket'
+Provides-Extra: qwen
+Requires-Dist: vision-agents-plugins-qwen; extra == 'qwen'
+Provides-Extra: redis
+Requires-Dist: redis[hiredis]>=5.0.0; extra == 'redis'
+Provides-Extra: roboflow
+Requires-Dist: vision-agents-plugins-roboflow; extra == 'roboflow'
+Provides-Extra: smart-turn
+Requires-Dist: vision-agents-plugins-smart-turn; extra == 'smart-turn'
+Provides-Extra: turbopuffer
+Requires-Dist: vision-agents-plugins-turbopuffer; extra == 'turbopuffer'
+Provides-Extra: twilio
+Requires-Dist: vision-agents-plugins-twilio; extra == 'twilio'
+Provides-Extra: ultralytics
+Requires-Dist: vision-agents-plugins-ultralytics; extra == 'ultralytics'
+Provides-Extra: vogent
+Requires-Dist: vision-agents-plugins-vogent; extra == 'vogent'
+Provides-Extra: wizper
+Requires-Dist: vision-agents-plugins-wizper; extra == 'wizper'
+Provides-Extra: xai
+Requires-Dist: vision-agents-plugins-xai; extra == 'xai'
+Description-Content-Type: text/markdown
+
+# Open Vision Agents by Stream
+
+Build Vision Agents quickly with any model or video provider.
+
+-  **Video AI**: Built for real-time video AI. Combine Yolo, Roboflow and others with gemini/openai realtime
+-  **Low Latency**: Join quickly (500ms) and low audio/video latency (30ms)
+-  **Open**: Built by Stream, but use any video edge network that you like
+-  **Native APIs**: Native SDK methods from OpenAI (create response), Gemini (generate) and Claude (create message). So you're never behind on the latest features
+-  **SDKs**: SDKs for React, Android, iOS, Flutter, React, React Native and Unity.
+
+Created by Stream, uses [Stream's edge network](https://getstream.io/video/) for ultra-low latency.
+
+See [Github](https://github.com/GetStream/Vision-Agents).
