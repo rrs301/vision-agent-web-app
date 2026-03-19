@@ -2,6 +2,26 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Voice + Vision Live Streaming Setup
+
+1. Set these environment variables in `.env`:
+   - `GOOGLE_API_KEY`
+   - `DEEPGRAM_API_KEY`
+
+2. Start the backend server:
+
+```bash
+python3 backend/main.py
+```
+
+3. Start the Next.js app:
+
+```bash
+npm run dev
+```
+
+4. Open the app and toggle **Voice Mode** + **Share Screen** to test live guidance.
+
 First, run the development server:
 
 ```bash
