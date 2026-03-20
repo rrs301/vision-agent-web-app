@@ -31,7 +31,15 @@ from getstream.video.rtc import PcmData, AudioFormat
 
 load_dotenv()
 
-app = FastAPI()
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("✅ [Backend] Startup complete")
+    yield
+    print("🔚 [Backend] Shutdown complete")
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,22 +48,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Shared but clean plugin instances
-class GlobalPlugins:
-    def __init__(self):
-        self.stt = None
-        self.tts = None
-
-gp = GlobalPlugins()
-
+# Global constants and storage
 SYSTEM_PROMPT_PREFIX = "You are a helpful voice assistant. RESPOND IN PLAIN TEXT ONLY. No markdown, no asterisks, no bullets. Keep sentences short and conversational. "
-
-# Global VLM session storage
 vlm_sessions: dict[str, gemini.VLM] = {}
-
-@app.on_event("startup")
-async def startup():
-    print("✅ [Backend] Startup complete")
 
 # Helper for standard REST streaming (non-live)
 async def stream_gemini_response(prompt, video_path=None, session_id=None, system_prompt=None):
@@ -343,30 +338,35 @@ async def live_chat_endpoint(websocket: WebSocket):
     try:
         await stt.start()
         print("🎙️ [STT] Started")
-        while True:
-            data = await websocket.receive()
-            if "bytes" in data:
-                pcm = PcmData.from_bytes(data["bytes"], sample_rate=16000, format=AudioFormat.S16, channels=1)
-                await stt.process_audio(pcm, participant=default_participant)
-            elif "text" in data:
-                msg = json.loads(data["text"])
-                if msg.get("type") == "prompt":
-                    reset_turn()
-                    await transcript_queue.put(msg.get("content"))
-                elif msg.get("type") == "image":
-                    try:
-                        # Decode base64 data URL (format: data:image/jpeg;base64,...)
-                        data_url = msg.get("content", "")
-                        if "," in data_url:
-                            img_data = base64.b64decode(data_url.split(",", 1)[1])
-                        else:
-                            img_data = base64.b64decode(data_url)
-                        pil_img = Image.open(io.BytesIO(img_data)).convert("RGB")
-                        frame = av.VideoFrame.from_image(pil_img)
-                        vlm._frame_buffer.append(frame)
-                        print(f"🖼️ [Live Chat] Added screen frame ({pil_img.size[0]}x{pil_img.size[1]}), buffer: {len(vlm._frame_buffer)}")
-                    except Exception as img_err:
-                        print(f"❌ [Live Chat] Error processing image: {img_err}")
+        while ws_connected:
+            try:
+                data = await websocket.receive()
+                if not ws_connected: break
+                
+                if "bytes" in data:
+                    pcm = PcmData.from_bytes(data["bytes"], sample_rate=16000, format=AudioFormat.S16, channels=1)
+                    await stt.process_audio(pcm, participant=default_participant)
+                elif "text" in data:
+                    msg = json.loads(data["text"])
+                    if msg.get("type") == "prompt":
+                        reset_turn()
+                        await transcript_queue.put(msg.get("content"))
+                    elif msg.get("type") == "image":
+                        try:
+                            # Decode base64 data URL (format: data:image/jpeg;base64,...)
+                            data_url = msg.get("content", "")
+                            if "," in data_url:
+                                img_data = base64.b64decode(data_url.split(",", 1)[1])
+                            else:
+                                img_data = base64.b64decode(data_url)
+                            pil_img = Image.open(io.BytesIO(img_data)).convert("RGB")
+                            frame = av.VideoFrame.from_image(pil_img)
+                            vlm._frame_buffer.append(frame)
+                            print(f"🖼️ [Live Chat] Added screen frame ({pil_img.size[0]}x{pil_img.size[1]}), buffer: {len(vlm._frame_buffer)}")
+                        except Exception as img_err:
+                            print(f"❌ [Live Chat] Error processing image: {img_err}")
+            except (WebSocketDisconnect, RuntimeError):
+                break
     
     except WebSocketDisconnect:
         print("🔌 [Live Chat] Disconnected")

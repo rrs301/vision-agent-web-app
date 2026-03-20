@@ -401,3 +401,29 @@ System Prompt: You are a Senior UI/UX Design Auditor reviewing the user's screen
 🎥 [Backend] Video Info: duration=0.04s, total_frames=0
 ✅ [Backend] Successfully extracted 1 frames from 1 decoded
 📦 [Backend] VLM buffer size: 1
+🚀 [Backend] /analyze_stream called with video=screenshot.jpg, prompt='Sharing screen for analysis', session_id=18da7385-6e99-49c2-9bd4-b56f004c1bc3
+💾 [Backend] Saving uploaded video to temp_videos/66612227-fecc-434c-b25e-704c98d25843.jpg
+✅ [Backend] Video saved successfully (87090 bytes)
+
+--- New Request: Fri Mar 20 14:09:48 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: temp_videos/66612227-fecc-434c-b25e-704c98d25843.jpg
+Session ID: 18da7385-6e99-49c2-9bd4-b56f004c1bc3
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🎥 [Backend] Video Info: duration=0.04s, total_frames=0
+✅ [Backend] Successfully extracted 1 frames from 1 decoded
+📦 [Backend] VLM buffer size: 1
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=093b57e5-a65c-4885-91a5-5b4ad93d47c3
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=093b57e5-a65c-4885-91a5-5b4ad93d47c3
+
+--- New Request: Fri Mar 20 14:30:10 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 093b57e5-a65c-4885-91a5-5b4ad93d47c3
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+
+--- New Request: Fri Mar 20 14:30:10 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 093b57e5-a65c-4885-91a5-5b4ad93d47c3
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
