@@ -60,12 +60,14 @@ async def startup():
     print("✅ [Backend] Global plugins initialized")
 
 # Helper for standard REST streaming (non-live)
-async def stream_gemini_response(prompt, video_path=None, session_id=None):
+async def stream_gemini_response(prompt, video_path=None, session_id=None, system_prompt=None):
+    active_system_prompt = system_prompt or SYSTEM_PROMPT_PREFIX
     with open("debug.log", "a") as f:
         f.write(f"\n--- New Request: {time.ctime()} ---\n")
         f.write(f"Prompt: {prompt}\n")
         f.write(f"Video Path: {video_path}\n")
         f.write(f"Session ID: {session_id}\n")
+        f.write(f"System Prompt: {active_system_prompt[:80]}...\n")
 
     vlm = None
     if session_id and session_id in vlm_sessions:
@@ -141,7 +143,7 @@ async def stream_gemini_response(prompt, video_path=None, session_id=None):
             if event.delta: await event_queue.put(event.delta)
         
         vlm.events.subscribe(on_chunk)
-        task = asyncio.create_task(vlm.simple_response(SYSTEM_PROMPT_PREFIX + prompt))
+        task = asyncio.create_task(vlm.simple_response(active_system_prompt + "\n\n" + prompt))
         
         while not task.done() or not event_queue.empty():
             try:
@@ -347,7 +349,8 @@ async def live_chat_endpoint(websocket: WebSocket):
 async def analyze_video_stream(
     video: UploadFile = File(None),
     prompt: str = Form("Describe this video"),
-    session_id: str = Form(None)
+    session_id: str = Form(None),
+    system_prompt: str = Form(None)
 ):
     call_msg = f"🚀 [Backend] /analyze_stream called with video={video.filename if video else 'None'}, prompt='{prompt}', session_id={session_id}"
     print(call_msg)
@@ -380,7 +383,7 @@ async def analyze_video_stream(
         
     async def wrapped_stream():
         try:
-            async for chunk in stream_gemini_response(prompt, video_path, session_id):
+            async for chunk in stream_gemini_response(prompt, video_path, session_id, system_prompt):
                 yield chunk
         finally:
             # Cleanup

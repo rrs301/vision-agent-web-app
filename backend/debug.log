@@ -113,3 +113,154 @@ Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
 Prompt: What tech do u recommand?
 Video Path: None
 Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🚀 [Backend] /analyze_stream called with video=None, prompt='What is Bat Brand name?', session_id=3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+
+--- New Request: Thu Mar 19 19:44:33 2026 ---
+Prompt: What is Bat Brand name?
+Video Path: None
+Session ID: 3ea3dd23-cdd8-453f-b55d-89cee3b4f46f
+🚀 [Backend] /analyze_stream called with video=None, prompt='Analyze the uploaded video', session_id=639e4a47-e670-48ac-96e3-948d04360d8a
+🚀 [Backend] /analyze_stream called with video=None, prompt='Analyze the uploaded video', session_id=639e4a47-e670-48ac-96e3-948d04360d8a
+
+--- New Request: Thu Mar 19 21:57:01 2026 ---
+Prompt: Analyze the uploaded video
+Video Path: None
+Session ID: 639e4a47-e670-48ac-96e3-948d04360d8a
+
+--- New Request: Thu Mar 19 21:57:01 2026 ---
+Prompt: Analyze the uploaded video
+Video Path: None
+Session ID: 639e4a47-e670-48ac-96e3-948d04360d8a
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=7e13b1e0-d271-4e00-9153-0712760ded7f
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=7e13b1e0-d271-4e00-9153-0712760ded7f
+
+--- New Request: Thu Mar 19 21:57:15 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 7e13b1e0-d271-4e00-9153-0712760ded7f
+
+--- New Request: Thu Mar 19 21:57:15 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 7e13b1e0-d271-4e00-9153-0712760ded7f
+🚀 [Backend] /analyze_stream called with video=None, prompt='Extract the key highlights and important moments from this video', session_id=0865c678-3a69-48f1-bf03-453172ec4d45
+🚀 [Backend] /analyze_stream called with video=None, prompt='Extract the key highlights and important moments from this video', session_id=0865c678-3a69-48f1-bf03-453172ec4d45
+
+--- New Request: Thu Mar 19 21:58:24 2026 ---
+Prompt: Extract the key highlights and important moments from this video
+Video Path: None
+Session ID: 0865c678-3a69-48f1-bf03-453172ec4d45
+
+--- New Request: Thu Mar 19 21:58:24 2026 ---
+Prompt: Extract the key highlights and important moments from this video
+Video Path: None
+Session ID: 0865c678-3a69-48f1-bf03-453172ec4d45
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=d7d11e61-4e70-4962-b884-c760df428c5e
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=d7d11e61-4e70-4962-b884-c760df428c5e
+
+--- New Request: Thu Mar 19 21:59:29 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: d7d11e61-4e70-4962-b884-c760df428c5e
+
+--- New Request: Thu Mar 19 21:59:29 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: d7d11e61-4e70-4962-b884-c760df428c5e
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='What is this game?', session_id=d7d11e61-4e70-4962-b884-c760df428c5e
+💾 [Backend] Saving uploaded video to temp_videos/40d1226d-b226-4865-863e-a13dc0e8300b.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 21:59:38 2026 ---
+Prompt: What is this game?
+Video Path: temp_videos/40d1226d-b226-4865-863e-a13dc0e8300b.mp4
+Session ID: d7d11e61-4e70-4962-b884-c760df428c5e
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='Do you think he will play lefty shot?', session_id=d7d11e61-4e70-4962-b884-c760df428c5e
+
+--- New Request: Thu Mar 19 22:00:04 2026 ---
+Prompt: Do you think he will play lefty shot?
+Video Path: None
+Session ID: d7d11e61-4e70-4962-b884-c760df428c5e
+🚀 [Backend] /analyze_stream called with video=None, prompt='Do u thin he is Fat?', session_id=d7d11e61-4e70-4962-b884-c760df428c5e
+
+--- New Request: Thu Mar 19 22:00:26 2026 ---
+Prompt: Do u thin he is Fat?
+Video Path: None
+Session ID: d7d11e61-4e70-4962-b884-c760df428c5e
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=6c06cac7-30d5-4f64-b12e-4c42267253e2
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=6c06cac7-30d5-4f64-b12e-4c42267253e2
+
+--- New Request: Thu Mar 19 22:00:43 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 6c06cac7-30d5-4f64-b12e-4c42267253e2
+
+--- New Request: Thu Mar 19 22:00:43 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 6c06cac7-30d5-4f64-b12e-4c42267253e2
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='.', session_id=f82c5adc-c9c1-4922-afd7-7fa4c064f212
+💾 [Backend] Saving uploaded video to temp_videos/93ff4d8d-cf19-4861-afa0-319b0356e9dc.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 22:04:41 2026 ---
+Prompt: .
+Video Path: temp_videos/93ff4d8d-cf19-4861-afa0-319b0356e9dc.mp4
+Session ID: f82c5adc-c9c1-4922-afd7-7fa4c064f212
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=968d484f-8581-4190-9885-56a870d31f20
+🚀 [Backend] /analyze_stream called with video=None, prompt='Voice assistant ready', session_id=968d484f-8581-4190-9885-56a870d31f20
+
+--- New Request: Thu Mar 19 22:04:52 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 968d484f-8581-4190-9885-56a870d31f20
+
+--- New Request: Thu Mar 19 22:04:52 2026 ---
+Prompt: Voice assistant ready
+Video Path: None
+Session ID: 968d484f-8581-4190-9885-56a870d31f20
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='Analyze this video', session_id=b4c47406-e2cc-482a-af75-4e645780207c
+💾 [Backend] Saving uploaded video to temp_videos/66e49390-3faf-4c5a-b8bc-07a317f772cf.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 22:05:13 2026 ---
+Prompt: Analyze this video
+Video Path: temp_videos/66e49390-3faf-4c5a-b8bc-07a317f772cf.mp4
+Session ID: b4c47406-e2cc-482a-af75-4e645780207c
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='Sharing screen for analysis', session_id=d2e5dd52-569b-41b9-8313-ff9b7b8cee95
+
+--- New Request: Thu Mar 19 22:14:46 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: None
+Session ID: d2e5dd52-569b-41b9-8313-ff9b7b8cee95
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Sharing screen for analysis', session_id=d2e5dd52-569b-41b9-8313-ff9b7b8cee95
+
+--- New Request: Thu Mar 19 22:14:49 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: None
+Session ID: d2e5dd52-569b-41b9-8313-ff9b7b8cee95
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Sharing screen for analysis', session_id=0a66c0da-d1dd-4bcb-b444-dce7d3975298
+
+--- New Request: Thu Mar 19 22:16:01 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: None
+Session ID: 0a66c0da-d1dd-4bcb-b444-dce7d3975298
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Sharing screen for analysis', session_id=0a66c0da-d1dd-4bcb-b444-dce7d3975298
+
+--- New Request: Thu Mar 19 22:16:13 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: None
+Session ID: 0a66c0da-d1dd-4bcb-b444-dce7d3975298
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...

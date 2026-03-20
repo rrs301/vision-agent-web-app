@@ -13,6 +13,8 @@ interface Message {
 
 interface ChatInterfaceProps {
   initialMessage: string;
+  initialAIMessage?: string;
+  systemPrompt?: string;
   initialVideo?: File;
   initialScreenshare?: boolean;
   onBack: () => void;
@@ -20,6 +22,8 @@ interface ChatInterfaceProps {
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   initialMessage,
+  initialAIMessage,
+  systemPrompt,
   initialVideo,
   initialScreenshare,
   onBack
@@ -47,6 +51,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (initialScreenshare) {
         await startScreenShare();
       }
+
+      // AI-initiated conversation: show AI greeting, wait for user
+      if (initialAIMessage) {
+        const aiGreeting: Message = {
+          id: 'ai-greeting',
+          role: 'assistant',
+          content: initialAIMessage,
+        };
+        setMessages([aiGreeting]);
+        return;
+      }
+
+      // User-initiated: send user message and get AI response
       let videoUrl: string | undefined;
       if (initialVideo) {
         videoUrl = URL.createObjectURL(initialVideo);
@@ -236,6 +253,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       const formData = new FormData();
       formData.append('prompt', prompt);
       formData.append('session_id', sessionId);
+      if (systemPrompt) formData.append('system_prompt', systemPrompt);
       if (fileToShare) formData.append('video', fileToShare);
 
       const response = await fetch('http://localhost:8000/analyze_stream', { method: 'POST', body: formData });
