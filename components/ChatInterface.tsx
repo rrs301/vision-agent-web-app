@@ -17,7 +17,10 @@ interface ChatInterfaceProps {
   systemPrompt?: string;
   initialVideo?: File;
   initialScreenshare?: boolean;
+  initialVoice?: boolean;
   onBack: () => void;
+  credits: number;
+  setCredits: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -26,7 +29,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   systemPrompt,
   initialVideo,
   initialScreenshare,
-  onBack
+  initialVoice,
+  onBack,
+  credits,
+  setCredits
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -34,7 +40,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(initialVoice || false);
   const [isLive, setIsLive] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
 
@@ -44,12 +50,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const pendingTranscriptRef = useRef('');
   const liveWsRef = useRef<WebSocket | null>(null);
   const frameIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const screenShareInitRef = useRef(false);
+  const screenStreamRef = useRef<MediaStream | null>(null);
+  const isStartingVoiceRef = useRef(false);
 
   // Initial setup and global cleanup
   useEffect(() => {
     const startChat = async () => {
+      let capturedFrame: File | undefined;
+
       if (initialScreenshare) {
-        await startScreenShare();
+        // Guard against React Strict Mode double-mount
+        if (screenShareInitRef.current) return;
+        screenShareInitRef.current = true;
+
+        const stream = await startScreenShare();
+        if (stream) {
+          capturedFrame = await captureFrameFromStream(stream) || undefined;
+        }
       }
 
       // AI-initiated conversation: show AI greeting, wait for user
@@ -77,7 +95,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       };
 
       setMessages([userMessage]);
-      await getAIResponse(initialMessage, initialVideo);
+      setCredits(prev => Math.max(0, prev - 1));
+      await getAIResponse(initialMessage, initialVideo || capturedFrame);
     };
 
     startChat();
@@ -90,35 +109,76 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   // Voice session toggle
   useEffect(() => {
     if (voiceEnabled) {
-      startLiveSession();
+      if (!isLive && !isStartingVoiceRef.current) {
+        startLiveSession();
+      }
     } else {
-      stopLiveSession();
+      if (isLive || isStartingVoiceRef.current) {
+        stopLiveSession();
+      }
     }
-  }, [voiceEnabled]);
+  }, [voiceEnabled, isLive]);
 
-  const captureFrame = (): Promise<File | null> => {
+  // Sync video element srcObject when screenStream changes
+  useEffect(() => {
+    screenStreamRef.current = screenStream;
+    if (videoRef.current) {
+      videoRef.current.srcObject = screenStream;
+    }
+  }, [screenStream]);
+
+  const captureFrameFromStream = (stream: MediaStream): Promise<File | null> => {
     return new Promise((resolve) => {
-      if (!videoRef.current || !screenStream) return resolve(null);
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return resolve(null);
-      ctx.drawImage(videoRef.current, 0, 0);
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(new File([blob], 'screenshot.jpg', { type: 'image/jpeg' }));
-        } else {
+      // Create a standalone video element for reliable capture
+      const tempVideo = document.createElement('video');
+      tempVideo.srcObject = stream;
+      tempVideo.muted = true;
+      tempVideo.playsInline = true;
+
+      const doCapture = () => {
+        if (tempVideo.videoWidth === 0 || tempVideo.videoHeight === 0) {
           resolve(null);
+          tempVideo.srcObject = null;
+          return;
         }
-      }, 'image/jpeg', 0.8);
+        const canvas = document.createElement('canvas');
+        canvas.width = tempVideo.videoWidth;
+        canvas.height = tempVideo.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(null); tempVideo.srcObject = null; return; }
+        ctx.drawImage(tempVideo, 0, 0);
+        canvas.toBlob((blob) => {
+          tempVideo.srcObject = null;
+          if (blob) {
+            resolve(new File([blob], 'screenshot.jpg', { type: 'image/jpeg' }));
+          } else {
+            resolve(null);
+          }
+        }, 'image/jpeg', 0.8);
+      };
+
+      // Wait for the video to have data
+      if (tempVideo.readyState >= 2) {
+        doCapture();
+      } else {
+        tempVideo.onloadeddata = doCapture;
+        tempVideo.play().catch(() => resolve(null));
+      }
     });
   };
 
+  const captureFrame = (): Promise<File | null> => {
+    if (!screenStream) return Promise.resolve(null);
+    return captureFrameFromStream(screenStream);
+  };
+
   const startLiveSession = async () => {
+    if (isStartingVoiceRef.current || isLive) return;
+    isStartingVoiceRef.current = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const ws = new WebSocket('ws://localhost:8000/live_chat');
+      const backendWsUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL || 'ws://localhost:8000';
+      const ws = new WebSocket(`${backendWsUrl}/live_chat`);
       liveWsRef.current = ws;
 
       // Playback (Agent -> User)
@@ -199,8 +259,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       };
 
       frameIntervalRef.current = setInterval(async () => {
-        if (screenStream && ws.readyState === WebSocket.OPEN) {
-          const frame = await captureFrame();
+        const currentStream = screenStreamRef.current;
+        if (currentStream && ws.readyState === WebSocket.OPEN) {
+          const frame = await captureFrameFromStream(currentStream);
           if (frame) {
             const reader = new FileReader();
             reader.onload = () => ws.send(JSON.stringify({ type: 'image', content: reader.result as string }));
@@ -213,6 +274,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } catch (err) {
       console.error("Error starting live session:", err);
       setVoiceEnabled(false);
+    } finally {
+      isStartingVoiceRef.current = false;
     }
   };
 
@@ -239,8 +302,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const getAIResponse = async (prompt: string, videoFile?: File) => {
     if (voiceEnabled) {
+      // Wait for WebSocket to be open if it's still connecting or being set up
+      let attempts = 0;
+      while (attempts < 10 && (!liveWsRef.current || liveWsRef.current.readyState === WebSocket.CONNECTING)) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        attempts++;
+      }
+
       if (liveWsRef.current?.readyState === WebSocket.OPEN) {
         liveWsRef.current.send(JSON.stringify({ type: 'prompt', content: prompt }));
+      } else {
+        console.warn("WebSocket not open, initial prompt skipped");
       }
       return;
     }
@@ -256,7 +328,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (systemPrompt) formData.append('system_prompt', systemPrompt);
       if (fileToShare) formData.append('video', fileToShare);
 
-      const response = await fetch('http://localhost:8000/analyze_stream', { method: 'POST', body: formData });
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/analyze_stream`, { method: 'POST', body: formData });
       if (!response.ok) throw new Error('Backend failed');
 
       const reader = response.body?.getReader();
@@ -282,14 +355,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
-  const startScreenShare = async () => {
+  const startScreenShare = async (): Promise<MediaStream | null> => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: "always" } as any, audio: false });
       setScreenStream(stream);
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      stream.getTracks()[0].onended = () => setScreenStream(null);
+      stream.getTracks()[0].onended = () => {
+        setScreenStream(null);
+        screenShareInitRef.current = false;
+      };
+      return stream;
     } catch (err) {
       console.error("Error sharing screen:", err);
+      screenShareInitRef.current = false;
+      return null;
     }
   };
 
@@ -316,6 +394,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     
     setInputValue('');
     setSelectedVideo(null);
+    
+    // Decrement credits
+    setCredits(prev => Math.max(0, prev - 1));
+    
     getAIResponse(msg || "Analyze this video", video || undefined);
   };
 
@@ -327,30 +409,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full flex-col bg-transparent animate-enter">
-      <header className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 glass">
-        <div className="flex items-center gap-3" onClick={onBack} style={{cursor: 'pointer'}}>
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center font-bold">V</div>
-          <h2 className="text-xl font-semibold hidden sm:block">Vision Agent</h2>
-        </div>
-        <div className="flex items-center gap-2 md:gap-4">
-          <button
-            onClick={() => setVoiceEnabled(!voiceEnabled)}
-            className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all ${voiceEnabled ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' : 'bg-zinc-500/10 text-zinc-400 hover:text-white'}`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-            <span className="hidden xs:inline">{voiceEnabled ? 'Voice Mode On' : 'Voice Mode Off'}</span>
-          </button>
-          <button
-            onClick={screenStream ? stopScreenShare : startScreenShare}
-            className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all ${screenStream ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-brand-primary/20 text-brand-primary hover:bg-brand-primary/30'}`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            <span className="hidden xs:inline">{screenStream ? 'Stop Sharing' : 'Share Screen'}</span>
-          </button>
-          <button onClick={onBack} className="text-zinc-400 hover:text-white transition-colors">New Chat</button>
-        </div>
-      </header>
+    <div className="flex h-[calc(100vh-5rem)] w-full flex-col bg-transparent animate-enter overflow-hidden">
+      {/* Session Controls Toolbar */}
+      <div className="flex items-center justify-end gap-2 px-6 py-3 bg-white/5 border-b border-white/10 backdrop-blur-sm">
+        <button
+          onClick={() => setVoiceEnabled(!voiceEnabled)}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${voiceEnabled ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' : 'bg-zinc-500/10 text-zinc-400 hover:text-white'}`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+          <span className="hidden xs:inline">{voiceEnabled ? 'Voice On' : 'Voice Off'}</span>
+        </button>
+        <button
+          onClick={screenStream ? stopScreenShare : startScreenShare}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${screenStream ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-brand-primary/20 text-brand-primary hover:bg-brand-primary/30'}`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span className="hidden xs:inline">{screenStream ? 'Stop Share' : 'Share Screen'}</span>
+        </button>
+      </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="max-w-4xl mx-auto space-y-6">
@@ -362,6 +438,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               </div>
               <video ref={videoRef} autoPlay playsInline muted className="w-full aspect-video object-cover" />
             </div>
+          )}
+          {!screenStream && (
+            <video ref={videoRef} style={{ display: 'none' }} />
           )}
 
           {messages.map((m) => (
@@ -434,10 +513,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               disabled={isTyping}
               className="w-full glass-input rounded-xl py-4 pl-12 pr-16 text-white placeholder:text-zinc-500 focus:ring-0 disabled:opacity-50"
             />
-            <button type="submit" disabled={(!inputValue.trim() && !selectedVideo) || isTyping} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-brand-primary hover:text-white transition-colors disabled:opacity-50">
+            <button 
+              type="submit" 
+              disabled={(!inputValue.trim() && !selectedVideo) || isTyping || credits <= 0} 
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-brand-primary hover:text-white transition-colors disabled:opacity-50"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
           </div>
+          {credits <= 0 && (
+            <div className="text-center p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm animate-enter">
+              You've used all your anonymous credits. Please <strong>Login</strong> to continue.
+            </div>
+          )}
         </form>
       </div>
     </div>

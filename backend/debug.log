@@ -264,3 +264,140 @@ Prompt: Sharing screen for analysis
 Video Path: None
 Session ID: 0a66c0da-d1dd-4bcb-b444-dce7d3975298
 System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Sharing screen for analysis', session_id=5809575e-c1c2-47e3-a7fd-6cfa19987b98
+
+--- New Request: Thu Mar 19 22:20:39 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: None
+Session ID: 5809575e-c1c2-47e3-a7fd-6cfa19987b98
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🚀 [Backend] /analyze_stream called with video=screenshot.jpg, prompt='Sharing screen for analysis', session_id=8bd1fc34-202b-41ce-8cf0-d63b267bef29
+💾 [Backend] Saving uploaded video to temp_videos/126afb8f-e467-4d6e-9753-ac9866ce02ce.jpg
+✅ [Backend] Video saved successfully (81794 bytes)
+
+--- New Request: Thu Mar 19 22:26:36 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: temp_videos/126afb8f-e467-4d6e-9753-ac9866ce02ce.jpg
+Session ID: 8bd1fc34-202b-41ce-8cf0-d63b267bef29
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🎥 [Backend] Video Info: duration=0.04s, total_frames=0
+✅ [Backend] Successfully extracted 1 frames from 1 decoded
+📦 [Backend] VLM buffer size: 1
+🚀 [Backend] /analyze_stream called with video=screenshot.jpg, prompt='Sharing screen for analysis', session_id=2e26f411-50f6-4413-a500-a835816e5a4b
+💾 [Backend] Saving uploaded video to temp_videos/149daa20-4d88-4ba3-a671-2cbf306ee6da.jpg
+✅ [Backend] Video saved successfully (81794 bytes)
+
+--- New Request: Thu Mar 19 22:31:23 2026 ---
+Prompt: Sharing screen for analysis
+Video Path: temp_videos/149daa20-4d88-4ba3-a671-2cbf306ee6da.jpg
+Session ID: 2e26f411-50f6-4413-a500-a835816e5a4b
+System Prompt: You are a real-time Visual AI Assistant observing the user's screen through live...
+🎥 [Backend] Video Info: duration=0.04s, total_frames=0
+✅ [Backend] Successfully extracted 1 frames from 1 decoded
+📦 [Backend] VLM buffer size: 1
+🚀 [Backend] /analyze_stream called with video=14033961_1080_1920_30fps.mp4, prompt='ABOUT THIS VIDEO', session_id=a2dd69b3-9dfe-4334-b8f4-b5b3fec5ab5b
+💾 [Backend] Saving uploaded video to temp_videos/26d40d77-124b-4eb9-afc7-2fbf75ca237c.mp4
+✅ [Backend] Video saved successfully (5242974 bytes)
+
+--- New Request: Thu Mar 19 22:33:45 2026 ---
+Prompt: ABOUT THIS VIDEO
+Video Path: temp_videos/26d40d77-124b-4eb9-afc7-2fbf75ca237c.mp4
+Session ID: a2dd69b3-9dfe-4334-b8f4-b5b3fec5ab5b
+System Prompt: You are a Video Highlights Expert. Your job is to find and describe the most imp...
+🎥 [Backend] Video Info: duration=6.139466666666666s, total_frames=0
+✅ [Backend] Successfully extracted 7 frames from 184 decoded
+📦 [Backend] VLM buffer size: 7
+🚀 [Backend] /analyze_stream called with video=None, prompt='hello', session_id=49f90459-d713-4c79-8a64-a4a6d33b349f
+🚀 [Backend] /analyze_stream called with video=None, prompt='hello', session_id=49f90459-d713-4c79-8a64-a4a6d33b349f
+
+--- New Request: Thu Mar 19 22:45:25 2026 ---
+Prompt: hello
+Video Path: None
+Session ID: 49f90459-d713-4c79-8a64-a4a6d33b349f
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+
+--- New Request: Thu Mar 19 22:45:25 2026 ---
+Prompt: hello
+Video Path: None
+Session ID: 49f90459-d713-4c79-8a64-a4a6d33b349f
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=0131c6a6-a2e4-44ed-bcd4-934d1f79ba89
+
+--- New Request: Thu Mar 19 22:46:11 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 0131c6a6-a2e4-44ed-bcd4-934d1f79ba89
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=0131c6a6-a2e4-44ed-bcd4-934d1f79ba89
+
+--- New Request: Thu Mar 19 22:46:11 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 0131c6a6-a2e4-44ed-bcd4-934d1f79ba89
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+
+--- New Request: Thu Mar 19 22:59:37 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+
+--- New Request: Thu Mar 19 22:59:37 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: 8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=None, prompt='What can U do?', session_id=8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+
+--- New Request: Thu Mar 19 22:59:44 2026 ---
+Prompt: What can U do?
+Video Path: None
+Session ID: 8d9cfa8b-fefb-4ec6-b5d5-f258a852f0cc
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=None, prompt='Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.', session_id=a0a6541a-36bb-49bf-b23e-85abbe63698a
+
+--- New Request: Fri Mar 20 08:52:43 2026 ---
+Prompt: Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.
+Video Path: None
+Session ID: a0a6541a-36bb-49bf-b23e-85abbe63698a
+System Prompt: You are a Senior UI/UX Design Auditor reviewing the user's screen in real-time....
+🚀 [Backend] /analyze_stream called with video=screenshot.jpg, prompt='Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.', session_id=4b5c7b83-7366-4d72-8a98-be9bb97ec5a8
+💾 [Backend] Saving uploaded video to temp_videos/a9eb03a6-ea42-4bd3-a312-828ce86c3ce9.jpg
+✅ [Backend] Video saved successfully (136921 bytes)
+
+--- New Request: Fri Mar 20 08:53:47 2026 ---
+Prompt: Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.
+Video Path: temp_videos/a9eb03a6-ea42-4bd3-a312-828ce86c3ce9.jpg
+Session ID: 4b5c7b83-7366-4d72-8a98-be9bb97ec5a8
+System Prompt: You are a Senior UI/UX Design Auditor reviewing the user's screen in real-time....
+🎥 [Backend] Video Info: duration=0.04s, total_frames=0
+✅ [Backend] Successfully extracted 1 frames from 1 decoded
+📦 [Backend] VLM buffer size: 1
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=b0fa1af0-6d6d-469b-9ca2-b222a0e41cf3
+🚀 [Backend] /analyze_stream called with video=None, prompt='Hi', session_id=b0fa1af0-6d6d-469b-9ca2-b222a0e41cf3
+
+--- New Request: Fri Mar 20 09:00:33 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: b0fa1af0-6d6d-469b-9ca2-b222a0e41cf3
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+
+--- New Request: Fri Mar 20 09:00:33 2026 ---
+Prompt: Hi
+Video Path: None
+Session ID: b0fa1af0-6d6d-469b-9ca2-b222a0e41cf3
+System Prompt: You are a helpful AI vision assistant. Respond in plain text only. No markdown, ...
+🚀 [Backend] /analyze_stream called with video=screenshot.jpg, prompt='Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.', session_id=4e41c4c4-2664-4917-9e8e-70451003d26e
+💾 [Backend] Saving uploaded video to temp_videos/0e901175-4319-49d9-9413-2ba93998138b.jpg
+✅ [Backend] Video saved successfully (140260 bytes)
+
+--- New Request: Fri Mar 20 09:01:08 2026 ---
+Prompt: Audit the UI/UX on my screen. Check for alignment, contrast, spacing, and accessibility issues.
+Video Path: temp_videos/0e901175-4319-49d9-9413-2ba93998138b.jpg
+Session ID: 4e41c4c4-2664-4917-9e8e-70451003d26e
+System Prompt: You are a Senior UI/UX Design Auditor reviewing the user's screen in real-time....
+🎥 [Backend] Video Info: duration=0.04s, total_frames=0
+✅ [Backend] Successfully extracted 1 frames from 1 decoded
+📦 [Backend] VLM buffer size: 1

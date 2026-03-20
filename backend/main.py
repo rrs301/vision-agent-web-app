@@ -55,9 +55,7 @@ vlm_sessions: dict[str, gemini.VLM] = {}
 
 @app.on_event("startup")
 async def startup():
-    gp.stt = deepgram.STT(eager_turn_detection=True)
-    gp.tts = deepgram.TTS()
-    print("✅ [Backend] Global plugins initialized")
+    print("✅ [Backend] Startup complete")
 
 # Helper for standard REST streaming (non-live)
 async def stream_gemini_response(prompt, video_path=None, session_id=None, system_prompt=None):
@@ -162,8 +160,11 @@ async def live_chat_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("🚀 [Live Chat] Session started")
     
-    # PER-SESSION VLM FOR HISTORY
+    # PER-SESSION VLM, STT, and TTS FOR ISOLATION
     vlm = gemini.VLM(model="gemini-flash-latest")
+    stt = deepgram.STT(eager_turn_detection=True)
+    tts = deepgram.TTS()
+    
     transcript_queue = asyncio.Queue()
     tts_text_queue = asyncio.Queue()
     default_participant = Participant(id="user", user_id="user", original=None)
@@ -172,6 +173,16 @@ async def live_chat_endpoint(websocket: WebSocket):
     session_tasks = []
     active_tasks = [] # Tracks LLM inference and TTS streaming per turn
     ai_active = False # Flag to know if AI is currently responding
+    ws_connected = True  # Guard flag to prevent sends on closed socket
+
+    async def safe_send(msg: dict):
+        """Send JSON to WebSocket only if still connected."""
+        if not ws_connected:
+            return
+        try:
+            await websocket.send_json(msg)
+        except Exception:
+            pass  # Connection already closed
 
     def reset_turn():
         nonlocal active_tasks, ai_active
@@ -188,35 +199,43 @@ async def live_chat_endpoint(websocket: WebSocket):
             active_tasks = []
         
         # 3. Notify frontend to silence immediate playback
-        asyncio.create_task(websocket.send_json({"type": "clear_audio"}))
+        if ws_connected:
+            try:
+                asyncio.create_task(safe_send({"type": "clear_audio"}))
+            except Exception:
+                pass
         ai_active = False
 
-    @gp.stt.events.subscribe
+    @stt.events.subscribe
     async def on_stt_transcript(event: STTTranscriptEvent):
+        if not ws_connected:
+            return
         if event.text:
             print(f"🎤 [STT Final]: {event.text}")
             reset_turn()
-            await websocket.send_json({"type": "transcript", "content": event.text})
+            await safe_send({"type": "transcript", "content": event.text})
             await transcript_queue.put(event.text)
 
-    @gp.stt.events.subscribe
+    @stt.events.subscribe
     async def on_stt_partial(event: STTPartialTranscriptEvent):
         nonlocal ai_active
+        if not ws_connected:
+            return
         if event.text and ai_active:
             # INSTANT BARGE-IN: Stop AI as soon as user starts speaking
             print(f"🤫 [Barge-in] User speaking: {event.text[:20]}...")
             reset_turn()
-            await websocket.send_json({"type": "partial_transcript", "content": event.text})
+            await safe_send({"type": "partial_transcript", "content": event.text})
 
     async def stream_to_tts(text):
         if not text.strip(): return
         clean_text = text.replace("**", "").replace("*", "").replace("#", "").replace("- ", "")
         print(f"🔊 [TTS] {clean_text[:40]}...")
         try:
-            async for pcm_chunk in await gp.tts.stream_audio(clean_text):
+            async for pcm_chunk in await tts.stream_audio(clean_text):
                 if pcm_chunk and len(pcm_chunk.samples) > 0:
                     b64_audio = base64.b64encode(pcm_chunk.to_bytes()).decode("utf-8")
-                    await websocket.send_json({"type": "audio", "content": b64_audio})
+                    await safe_send({"type": "audio", "content": b64_audio})
         except asyncio.CancelledError:
             raise
         except Exception as e:
@@ -285,7 +304,7 @@ async def live_chat_endpoint(websocket: WebSocket):
                         if delta is None: break
                         
                         clean_delta = delta.replace("**", "").replace("*", "")
-                        await websocket.send_json({"type": "text", "content": clean_delta})
+                        await safe_send({"type": "text", "content": clean_delta})
                         current_sentence += clean_delta
                         
                         if any(c in clean_delta for c in ".!?\n") and len(current_sentence) > 20:
@@ -304,7 +323,7 @@ async def live_chat_endpoint(websocket: WebSocket):
                         inference_task.cancel()
                     
                     # Ensure turn is marked as complete even if cancelled
-                    await websocket.send_json({"type": "text_end"})
+                    await safe_send({"type": "text_end"})
                 
                 transcript_queue.task_done()
                 ai_active = False
@@ -322,25 +341,49 @@ async def live_chat_endpoint(websocket: WebSocket):
     session_tasks = [orchestrator_task, tts_worker_task, vlm]
 
     try:
-        await gp.stt.start()
+        await stt.start()
         print("🎙️ [STT] Started")
         while True:
             data = await websocket.receive()
             if "bytes" in data:
                 pcm = PcmData.from_bytes(data["bytes"], sample_rate=16000, format=AudioFormat.S16, channels=1)
-                await gp.stt.process_audio(pcm, participant=default_participant)
+                await stt.process_audio(pcm, participant=default_participant)
             elif "text" in data:
                 msg = json.loads(data["text"])
                 if msg.get("type") == "prompt":
                     reset_turn()
                     await transcript_queue.put(msg.get("content"))
+                elif msg.get("type") == "image":
+                    try:
+                        # Decode base64 data URL (format: data:image/jpeg;base64,...)
+                        data_url = msg.get("content", "")
+                        if "," in data_url:
+                            img_data = base64.b64decode(data_url.split(",", 1)[1])
+                        else:
+                            img_data = base64.b64decode(data_url)
+                        pil_img = Image.open(io.BytesIO(img_data)).convert("RGB")
+                        frame = av.VideoFrame.from_image(pil_img)
+                        vlm._frame_buffer.append(frame)
+                        print(f"🖼️ [Live Chat] Added screen frame ({pil_img.size[0]}x{pil_img.size[1]}), buffer: {len(vlm._frame_buffer)}")
+                    except Exception as img_err:
+                        print(f"❌ [Live Chat] Error processing image: {img_err}")
     
     except WebSocketDisconnect:
         print("🔌 [Live Chat] Disconnected")
     except Exception as e:
         print(f"❌ [Live Chat Main Error]: {e}")
     finally:
+        ws_connected = False  # Mark closed FIRST to stop all sends
         reset_turn()
+        # Unsubscribe STT handlers
+        try:
+            stt.events.unsubscribe(on_stt_transcript)
+        except Exception:
+            pass
+        try:
+            stt.events.unsubscribe(on_stt_partial)
+        except Exception:
+            pass
         for t in session_tasks: 
             if hasattr(t, 'cancel'): t.cancel()
         print("🔚 [Live Chat] Session closed")
@@ -398,4 +441,5 @@ async def analyze_video_stream(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
