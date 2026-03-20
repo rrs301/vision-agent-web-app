@@ -9,7 +9,7 @@ vision-agents==0.4.3
 google-genai==1.67.0
 deepgram-sdk==6.0.1
 getstream==3.0.0
-aiortc==1.13.0.post1
+aiortc==1.13.0
 numpy==2.2.6
 onnxruntime==1.24.3
 scipy==1.15.3
