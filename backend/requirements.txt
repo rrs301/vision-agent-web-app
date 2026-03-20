@@ -5,7 +5,8 @@ python-multipart==0.0.22
 python-dotenv==1.2.2
 Pillow==10.4.0
 av==14.2.0
-vision-agents==0.4.3
+vision-agents>=0.4.3
+vision-agents-plugins-gemini>=0.4.3
 google-genai==1.67.0
 deepgram-sdk==6.0.1
 getstream==3.0.0
