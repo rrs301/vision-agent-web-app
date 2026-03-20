@@ -25,7 +25,7 @@ from PIL import Image
 # vision-agents imports (now from deps)
 from vision_agents.plugins import deepgram, gemini
 from vision_agents.core.edge.types import Participant
-from vision_agents.core.stt import STTTranscriptEvent, STTPartialTranscriptEvent
+from vision_agents.core.stt.events import STTTranscriptEvent, STTPartialTranscriptEvent
 from vision_agents.core.llm.events import LLMResponseChunkEvent
 from getstream.video.rtc import PcmData, AudioFormat
 
