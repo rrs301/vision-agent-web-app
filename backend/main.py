@@ -12,7 +12,7 @@ from pathlib import Path
 # Add vendored dependencies to sys.path
 deps_path = str(Path(__file__).parent / "deps")
 if deps_path not in sys.path:
-    sys.path.insert(0, deps_path)
+    sys.path.append(deps_path)
 
 import av
 
